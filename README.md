@@ -1,4 +1,4 @@
-# Gregory House's Home-Assistant
+# Gregory House's Home Assistant
 
 HA Custom component 를 제작합니다.
 
