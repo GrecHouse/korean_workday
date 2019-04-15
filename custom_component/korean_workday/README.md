@@ -43,15 +43,27 @@ binary_sensor:
 <br>
 
 **Configuration variables:**
-key | description
-:--- | :---
-**platform** _(필수)_ | korean_workday
-**name** _(옵션)_ | 센서 이름
-**service_key** _(옵션)_ | data.go.kr 서비스키
-**add_holidays** _(옵션)_ | 휴일로 추가할 날짜 리스트 <br>- YYYYMMDD 형식<br> **(주의) YYYY-MM-DD가 아님**
-**workdays** _(옵션)_ | workday 요일 리스트 <br>_Default value: [mon, tue, wed, thu, fri]_
-**excludes** _(옵션)_ | 휴일 리스트 <br>_Default value: [sat, sun, holiday]_
-**days_offset** _(옵션)_ | Set days offset<br>_(e.g., -1 for yesterday, 1 for tomorrow)_
+- **platform** _(필수)_
+    - korean_workday
+- **name** _(옵션)_ 
+    - 센서 이름
+    - 기본값 `korean_workday`
+- **service_key** _(옵션)_ 
+    - data.go.kr 서비스키
+- **add_holidays** _(옵션)_ 
+    * 휴일로 추가할 날짜 리스트 
+    * ` - YYYYMMDD` 형식
+    * **(주의) YYYY-MM-DD가 아님**
+- **workdays** _(옵션)_ 
+    - workday 요일 리스트 
+    - _Default value: [mon, tue, wed, thu, fri]_
+- **excludes** _(옵션)_ 
+    - 휴일 리스트 
+    - _Default value: [sat, sun, holiday]_
+- **days_offset** _(옵션)_ 
+    - Set days offset
+    - _(e.g., -1 for yesterday, 1 for tomorrow)_
+
 
 <br>
 
