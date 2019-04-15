@@ -7,7 +7,7 @@
 
 <br>
 
-## Inatallation
+## Installation
 
 - HA 설치 경로 아래 custom_component 에 파일을 넣어줍니다. <br>`<config directory>/custom_components/korean_workday/binary_sensor.py`
 - configuration.yaml 파일에 설정을 추가합니다.
@@ -18,7 +18,7 @@
 ## Usage
 
 ### OPEN API 이용하기 (옵션)
-- 하루에 한 번 API 호출을 통해 휴일 목록을 가져옵니다.
+- 하루에 한 번 API 호출을 통해 휴일 목록을 가져옵니다. eat
 - 공공데이터포털에서 서비스키를 발급받아야 합니다.\
 [특일정보 활용신청](https://www.data.go.kr/dataset/15012690/openapi.do)
 - 근로자의 날 5월 1일은 공휴일이 아니라고 합니다. add_holidays에 추가하세요.
