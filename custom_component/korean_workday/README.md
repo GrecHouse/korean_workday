@@ -55,6 +55,17 @@ key | description
 
 <br>
 
+**Configuration variables:**
+key | description
+:--- | :---
+**platform** (필수_ | korean_workday
+**name** (옵션) | 센서 이름
+**service_key** (옵션) | data.go.kr 서비스키
+**add_holidays** _(옵션)_ | 휴일로 추가할 날짜 리스트 - YYYYMMDD 형식 **(주의) YYYY-MM-DD가 아님**
+**workdays** _(옵션)_ | workday 요일 리스트 _Default value: [mon, tue, wed, thu, fri]_
+**excludes** _(옵션)_ | 휴일 리스트 _Default value: [sat, sun, holiday]_
+**days_offset** _(옵션)_ | Set days offset_(e.g., -1 for yesterday, 1 for tomorrow)_
+
 ## Full example
 월화수목 주4일 근무(부럽..)하고 custom 휴일을 추가한 예
 
