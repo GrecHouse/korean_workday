@@ -35,7 +35,7 @@ DEFAULT_EXCLUDES = ['sat', 'sun', 'holiday']
 DEFAULT_NAME = 'Korean Workday'
 DEFAULT_OFFSET = 0
 
-SERVICE_URL = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getHoliDeInfo?ServiceKey={0}&solYear={1}&solMonth={2}'
+SERVICE_URL = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?ServiceKey={0}&solYear={1}&solMonth={2}'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_SERVICE_KEY): cv.string,
