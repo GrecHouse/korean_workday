@@ -1,0 +1,53 @@
+# Built with Jekyll 3.2.0
+
+# Setup
+title:               GrecHouse.
+tagline:             'show me the money'
+description:         'Gregory House Blog.'
+url:                 'http://grechouse.github.io'
+baseurl:             ''
+
+# About/contact
+author:
+  name:              Gregory House
+  url:               http://grechouse.github.io
+  email:             houseidiot@n.com
+
+# Permalinks
+
+# Color scheme. Options: red, orange, magenta, cyan, blue, brown
+color-scheme: 
+
+permalink: pretty
+permalink: /:title/
+
+# Set encoding to UTF-8
+encoding: utf-8
+
+# Collections for texts
+collections:
+  texts:
+    output: true
+
+# Markdown specs
+markdown: kramdown
+
+kramdown:
+  auto_ids:       true
+  footnote_nr:    1
+  entity_output:  as_char
+  footnote_backlink: "&#x21a9;&#xfe0e;"
+  toc_levels:     1..6
+  smart_quotes:   lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+
+# Exclusions from the final site
+exclude:
+  - optional
+  - vendor
+
+# Theme
+#theme: "ed."
+remote_theme: "minicomp/ed"
+
+
