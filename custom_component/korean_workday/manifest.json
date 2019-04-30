@@ -1,0 +1,10 @@
+{
+  "domain": "korean_workday",
+  "name": "Korean Workday",
+  "documentation": "https://github.com/GrecHouse/homeassistant/tree/master/custom_component/korean_workday",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": [
+    "@GrecHouse"
+  ]
+}
