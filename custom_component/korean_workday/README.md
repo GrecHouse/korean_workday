@@ -10,6 +10,8 @@
 ## Installation
 
 - HA 설치 경로 아래 custom_component 에 파일을 넣어줍니다. <br>`<config directory>/custom_components/korean_workday/binary_sensor.py`
+<br>`<config directory>/custom_components/korean_workday/__init__.py`
+<br>`<config directory>/custom_components/korean_workday/manifest.json`
 - configuration.yaml 파일에 설정을 추가합니다.
 - Home-Assistant 를 재시작합니다.
 
