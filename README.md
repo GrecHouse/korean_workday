@@ -4,7 +4,7 @@ HA Custom component 를 제작합니다.
 
 ## Authors
 
-* **Gregory House** - *Initial work* - [GrecHouse](https://github.com/GrecHouse)
+* **Gregory House** - [GrecHouse](https://grechouse.github.io)
 
 ## License
 
