@@ -3,7 +3,7 @@ Sensor to indicate whether the current day is a workday. (korean version)
 
 For more details about this platform, please refer to the documentation at
 https://www.home-assistant.io/components/workday/
-https://github.com/GrecHouse/homeassistant/tree/master/custom_component/korean_workday
+https://github.com/GrecHouse/korean_workday
 https://cafe.naver.com/stsmarthome/8226
 """
 
