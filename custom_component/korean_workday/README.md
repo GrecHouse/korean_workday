@@ -9,11 +9,12 @@
 
 ## Installation
 
-- HA 설치 경로 아래 custom_component 에 파일을 넣어줍니다. <br>`<config directory>/custom_components/korean_workday/binary_sensor.py`
+- HA 설치 경로 아래 custom_component 에 파일을 넣어줍니다. 
+<br>`<config directory>/custom_components/korean_workday/binary_sensor.py`
 <br>`<config directory>/custom_components/korean_workday/__init__.py`
 <br>`<config directory>/custom_components/korean_workday/manifest.json`
 - configuration.yaml 파일에 설정을 추가합니다.
-- Home-Assistant 를 재시작합니다.
+- Home Assistant 를 재시작합니다.
 
 <br>
 
@@ -25,6 +26,16 @@
 [특일정보 활용신청](https://www.data.go.kr/dataset/15012690/openapi.do)
 - 근로자의 날 5월 1일은 공휴일이 아니라고 합니다. add_holidays에 추가하세요.
 - API 사용을 하지 않으려면 add_holidays 항목에 휴일 목록을 수작업으로 모두 넣어주면 됩니다.
+
+<br>
+
+### 장보기목록(Shopping List) 이용하기
+- 갑작스런 휴가 등으로 인해 휴일 추가가 필요한 경우 HA 의 장보기목록 기능을 이용할 수 있습니다. 
+- 설정 변경 후 재시작할 필요가 없습니다!
+- 장보기목록에 `#YYYYMMDD` 형식으로 날짜를 넣으면 휴일로 추가됩니다.
+- 장보기목록에서 완료처리(체크) 하면 휴일에서 제거됩니다. 
+- 당일 휴일 등록 또는 완료(체크)시 센서값 변경까지 최대 30분 정도 소요될 수 있습니다.
+- (주의) 당일 휴일 삭제는 장보기목록에서 체크한 상태에서 센서값이 변경된 것을 확인한 다음 삭제하세요.
 
 <br>
 

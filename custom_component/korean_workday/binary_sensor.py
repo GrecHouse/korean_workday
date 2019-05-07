@@ -16,6 +16,7 @@ from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME, WEEKDAYS
 from homeassistant.components.binary_sensor import BinarySensorDevice
 import homeassistant.helpers.config_validation as cv
+from homeassistant.util.json import load_json
 import requests
 import xml.etree.ElementTree as ET
 
@@ -34,6 +35,8 @@ DEFAULT_WORKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri']
 DEFAULT_EXCLUDES = ['sat', 'sun', 'holiday']
 DEFAULT_NAME = 'Korean Workday'
 DEFAULT_OFFSET = 0
+
+PERSISTENCE = '.shopping_list.json'
 
 SERVICE_URL = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?ServiceKey={0}&solYear={1}&solMonth={2}'
 
@@ -145,6 +148,23 @@ class IsWorkdaySensor(BinarySensorDevice):
             _LOGGER.error('Failed to get data.go.kr API Error: %s', ex)
         return False
 
+    def add_shopping_list_holiday(self):
+        """Check for user added holiday."""
+        shopping_list = load_json(self.hass.config.path(PERSISTENCE), default=[])
+        for item in shopping_list:
+            if item['name'].startswith('#'):
+                adddate = item['name'].replace('#','')
+                try:
+                    datetime.strptime(adddate, '%Y%m%d')
+                    if item['complete']:
+                        self._obj_holidays.remove(adddate)
+                        _LOGGER.debug("Remove ShoppingList holiday : %s", adddate)
+                    else:
+                        self._obj_holidays.append(adddate)
+                        _LOGGER.debug("Add ShoppingList holiday : %s", adddate)
+                except ValueError:
+                    _LOGGER.debug("Not date : %s", adddate)
+
     def set_last_updated(self, last_updated):
         """Set the state attributes."""
         self._last_updated = last_updated
@@ -170,6 +190,8 @@ class IsWorkdaySensor(BinarySensorDevice):
         day = date.isoweekday() - 1
         day_of_week = day_to_string(day)
         dateStr = date.strftime('%Y%m%d')
+
+        self.add_shopping_list_holiday()
 
         if self._service_key and \
             ( self._last_updated is None or self._last_updated.strftime('%Y%m%d') != dateStr ) :
