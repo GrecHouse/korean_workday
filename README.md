@@ -3,7 +3,8 @@
 
 
 현재 날짜가 일하는날인지의 여부를 나타냅니다. \
-파이썬의 holidays 모듈을 사용하는 HA의 workday 센서가 한국 휴일을 지원하지 않기 때문에, 공공데이터포털의 휴일 API를 이용하는 커스텀 컴포넌트를 만들었습니다.
+파이썬의 holidays 모듈을 사용하는 HA의 workday 센서가 한국 휴일을 지원하지 않기 때문에, \
+공공데이터포털의 휴일 API를 이용하는 커스텀 컴포넌트를 만들었습니다.
 
 <br>
 
@@ -106,6 +107,7 @@ automation:
 <br>
 
 ## 버그 또는 문의사항
-네이버 카페 [SmartThings&IoT Home](https://cafe.naver.com/stsmarthome/) ID **그레고리하우스**
+네이버 카페 [HomeAssistant](https://cafe.naver.com/koreassistant/) `그렉하우스` \
+네이버 카페 [SmartThings&IoT Home](https://cafe.naver.com/stsmarthome/) `그레고리하우스`
 
 
