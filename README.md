@@ -1,8 +1,7 @@
 ![version](https://img.shields.io/badge/version-1.0-blue)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
 # Korean Workday Binary Sensor
-
-
 
 현재 날짜가 일하는날인지의 여부를 나타냅니다. \
 파이썬의 holidays 모듈을 사용하는 HA의 workday 센서가 한국 휴일을 지원하지 않기 때문에, \
@@ -12,12 +11,19 @@
 
 ## Installation
 
+### 직접 설치
 - HA 설치 경로 아래 custom_component 에 파일을 넣어줍니다.
 <br>`<config directory>/custom_components/korean_workday/binary_sensor.py`
 <br>`<config directory>/custom_components/korean_workday/__init__.py`
 <br>`<config directory>/custom_components/korean_workday/manifest.json`
 - configuration.yaml 파일에 설정을 추가합니다.
 - Home Assistant 를 재시작합니다.
+
+### HACS로 설치
+- HACS > SETTINGS 메뉴 선택
+- ADD CUSTOM REPOSITORY에 `https://github.com/GrecHouse/korean_workday` 입력, \
+  Category에 `Integration` 선택 후 저장
+- HACS > INTEGRATIONS 메뉴에서 `[KR] Korean Workday Sensor` 검색하여 설치
 
 <br>
 
