@@ -1,5 +1,5 @@
 {
-  "name": "[KR] Korean Workday ",
+  "name": "[KR] Korean Workday Sensor",
   "country": "KR",
   "domains": ["binary_sensor"],  
   "render_readme": true
