@@ -1,4 +1,4 @@
-![version](https://img.shields.io/badge/version-1.0-blue)
+![version](https://img.shields.io/badge/version-2.0-blue)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
 # Korean Workday Binary Sensor
@@ -8,6 +8,22 @@
 공공데이터포털의 휴일 API를 이용하는 커스텀 컴포넌트를 만들었습니다.
 
 <br>
+
+## Screenshot
+![screenshot_korean_workday](https://user-images.githubusercontent.com/49514473/79182222-44311080-7e49-11ea-8ccd-5d676027717c.png)\
+\
+![screenshot_workday_card](https://user-images.githubusercontent.com/49514473/79179537-cff36e80-7e42-11ea-8214-f42edbbc5703.png)
+
+<br>
+
+## Version history
+| Version | Date        |               |
+| :-----: | :---------: | ------------- |
+| v1.0    | 2019.04.15  | 최초 버전 |
+| v2.0    | 2020.04.14  | 기능개선, lovelace 카드 추가 |
+
+<br>
+
 
 ## Installation
 
@@ -25,28 +41,36 @@
   Category에 `Integration` 선택 후 저장
 - HACS > INTEGRATIONS 메뉴에서 `[KR] Korean Workday Sensor` 검색하여 설치
 
+### Lovelace 카드 설치
+- [korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card)
+
 <br>
 
 ## Usage
 
-### OPEN API 이용하기 (옵션)
+### 2.0 버전 수정사항
+- 공공데이터포털 API 없이도 매일 휴일 목록을 업데이트합니다.\
+API 키 발급이 필요없습니다.
+- 1.0 버전의 장보기목록(Shopping List)은 더이상 지원하지 않습니다.\
+대신 [korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card) 를 이용하세요.
+
+<br>
+
+### 공공데이터포털 OPEN API 이용하기 (옵션)
+- 직접 API를 이용하고 싶은 분은 사용하셔도 됩니다.
 - 하루에 한 번 API 호출을 통해 휴일 목록을 가져옵니다.
 - 공공데이터포털에서 서비스키를 발급받아야 합니다.\
 [특일정보 활용신청](https://www.data.go.kr/dataset/15012690/openapi.do)
-- 근로자의 날 5월 1일은 공휴일이 아니라고 합니다. add_holidays에 추가하세요.
-- API 사용을 하지 않으려면 add_holidays 항목에 휴일 목록을 수작업으로 모두 넣어주면 됩니다.
 
 <br>
 
-### 장보기목록(Shopping List) 이용하기
-- 갑작스런 휴가 등으로 인해 휴일 추가가 필요한 경우 HA 의 장보기목록 기능을 이용할 수 있습니다.
-- 설정 변경 후 재시작할 필요가 없습니다!
-- 장보기목록에 `#YYYYMMDD` 형식으로 날짜를 넣으면 휴일로 추가됩니다.
-- 장보기목록에서 완료처리(체크) 하면 휴일에서 제거됩니다.
-- 당일 휴일 등록 또는 완료(체크)시 센서값 변경까지 최대 30분 정도 소요될 수 있습니다.
-- (주의) 당일 휴일 삭제는 장보기목록에서 체크한 상태에서 센서값이 변경된 것을 확인한 다음 삭제하세요.
+### 참고사항
+- 근로자의 날 5월 1일은 공휴일이 아니라고 합니다. add_holidays에 추가하거나 lovelace 카드에 추가하세요.
+- lovelace 카드를 사용하지 않으려면, add_holidays 항목에 휴일 목록을 수작업으로 모두 넣어주면 됩니다.
 
 <br>
+
+
 
 ### configuration
 - 기본적인 설정은 HA의 workday 센서 설정과 동일합니다.\
@@ -79,6 +103,15 @@ binary_sensor:
 <br>
 
 ## Full example
+
+기본 설정으로 사용하기 (주말과 공휴일만 쉴 경우)
+```yaml
+# Example configuration.yaml entry
+binary_sensor:
+  - platform: korean_workday
+```
+<br>
+
 월화수목 주4일 근무(부럽..)하고 custom 휴일을 추가한 예
 
 ```yaml
