@@ -87,6 +87,7 @@ API 키 발급이 필요없습니다.
 [https://www.home-assistant.io/components/workday/](https://www.home-assistant.io/components/workday/)
 - country, province 는 빠지고 service_key 가 추가되었습니다.
 - add_holidays 의 날짜 형식은 `YYYYMMDD` 형식으로 변경되었습니다.
+- lovelace 카드를 함께 사용하려면 input_text 엔티티도 하나 추가해주세요.
 
 **Example configuration.yaml:**
 ```yaml
@@ -95,6 +96,11 @@ binary_sensor:
     service_key: 'data.go.kr api key'
     add_holidays:
       - '20190501'
+
+input_text:
+  holiday:
+    name: Holiday
+    max: 255
 ```
 <br>
 
