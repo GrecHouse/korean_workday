@@ -66,8 +66,8 @@ API 키 발급이 필요없습니다.
 <br>
 
 ### (옵션) 장보기목록(Shopping List) 이용하기
+- 이 옵션보다는 [korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card) 사용을 권장합니다.
 - shopping_list 옵션을 true 로 지정했을 경우에만 처리됩니다.
-- 갑작스런 휴가 등으로 인해 휴일 추가가 필요한 경우 HA 의 장보기목록 기능을 이용할 수 있습니다.
 - 장보기목록에 `#YYYYMMDD` 형식으로 날짜를 넣으면 휴일로 추가됩니다.
 - 장보기목록에서 완료처리(체크) 하면 휴일에서 제거됩니다.
 - 당일 휴일 등록 또는 완료(체크)시 센서값 변경까지 최대 30분 정도 소요될 수 있습니다.
