@@ -51,17 +51,27 @@
 ### 2.0 버전 수정사항
 - 공공데이터포털 API 없이도 매일 휴일 목록을 업데이트합니다.\
 API 키 발급이 필요없습니다.
-- 1.0 버전의 장보기목록(Shopping List)은 더이상 지원하지 않습니다.\
-대신 [korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card) 를 이용하세요.
+- 1.0 버전의 장보기목록(Shopping List) 대신 사용할 수 있는 커스텀 카드를 만들었습니다.\
+[korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card) 를 이용하세요.
 - 휴일인 경우 속성값으로 `holiday name`이 추가됩니다.
 
 <br>
 
-### 공공데이터포털 OPEN API 이용하기 (옵션)
+### (옵션) 공공데이터포털 OPEN API 이용하기
 - 직접 API를 이용하고 싶은 분은 사용하셔도 됩니다.
 - 하루에 한 번 API 호출을 통해 휴일 목록을 가져옵니다.
 - 공공데이터포털에서 서비스키를 발급받아야 합니다.\
 [특일정보 활용신청](https://www.data.go.kr/dataset/15012690/openapi.do)
+
+<br>
+
+### (옵션) 장보기목록(Shopping List) 이용하기
+- shopping_list 옵션을 true 로 지정했을 경우에만 처리됩니다.
+- 갑작스런 휴가 등으로 인해 휴일 추가가 필요한 경우 HA 의 장보기목록 기능을 이용할 수 있습니다.
+- 장보기목록에 `#YYYYMMDD` 형식으로 날짜를 넣으면 휴일로 추가됩니다.
+- 장보기목록에서 완료처리(체크) 하면 휴일에서 제거됩니다.
+- 당일 휴일 등록 또는 완료(체크)시 센서값 변경까지 최대 30분 정도 소요될 수 있습니다.
+- (주의) 당일 휴일 삭제는 장보기목록에서 체크한 상태에서 센서값이 변경된 것을 확인한 다음 삭제하세요.
 
 <br>
 
@@ -70,7 +80,6 @@ API 키 발급이 필요없습니다.
 - lovelace 카드를 사용하지 않으려면, add_holidays 항목에 휴일 목록을 수작업으로 모두 넣어주면 됩니다.
 
 <br>
-
 
 
 ### configuration
@@ -100,6 +109,7 @@ binary_sensor:
 |workdays| (옵션) 근무일 리스트. 미설정시 기본값은 [mon, tue, wed, thu, fri] |
 |excludes| (옵션) 휴일 리스트. 미설정시 기본값은 [sat, sun, holiday] |
 |days_offset| (옵션) Set days offset (e.g., -1 for yesterday, 1 for tomorrow) |
+|shopping_list| (옵션) 장보기목록 사용여부. 기본값은 false |
 
 <br>
 
