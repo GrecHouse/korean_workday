@@ -53,6 +53,7 @@
 API 키 발급이 필요없습니다.
 - 1.0 버전의 장보기목록(Shopping List)은 더이상 지원하지 않습니다.\
 대신 [korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card) 를 이용하세요.
+- 휴일인 경우 속성값으로 `holiday name`이 추가됩니다.
 
 <br>
 
