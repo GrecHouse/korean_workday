@@ -1,28 +1,28 @@
 """
-Sensor to indicate whether the current day is a workday. (korean version)
+Sensor to indicate whether the current day is a workday. (for korean)
 
 For more details about this platform, please refer to the documentation at
 https://www.home-assistant.io/components/workday/
 https://github.com/GrecHouse/korean_workday
-https://cafe.naver.com/stsmarthome/8226
 """
 
 import logging
 from datetime import datetime, timedelta
-
 import voluptuous as vol
-
 from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import CONF_NAME, WEEKDAYS
+from homeassistant.const import CONF_NAME, WEEKDAYS, EVENT_HOMEASSISTANT_START
 from homeassistant.components.binary_sensor import BinarySensorDevice
+from homeassistant.core import callback
+from homeassistant.helpers.event import async_track_state_change
+from homeassistant.helpers.event import async_track_point_in_utc_time
 import homeassistant.helpers.config_validation as cv
+import homeassistant.util.dt as dt_util
 from homeassistant.util.json import load_json
-import requests
-import xml.etree.ElementTree as ET
+from requests import get
+import json
+import xmltodict
 
 _LOGGER = logging.getLogger(__name__)
-
-SCAN_INTERVAL = timedelta(seconds=1800)
 
 ALLOWED_DAYS = WEEKDAYS + ['holiday']
 CONF_SERVICE_KEY = 'service_key'
@@ -30,18 +30,24 @@ CONF_WORKDAYS = 'workdays'
 CONF_EXCLUDES = 'excludes'
 CONF_OFFSET = 'days_offset'
 CONF_ADD_HOLIDAYS = 'add_holidays'
+CONF_HOLIDAY_NAME = 'holiday_name'
+CONF_INPUT_ENTITY = 'input_entity'
+CONF_USE_SHOPPING_LIST = 'shopping_list'
 
 DEFAULT_WORKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri']
 DEFAULT_EXCLUDES = ['sat', 'sun', 'holiday']
 DEFAULT_NAME = 'Korean Workday'
+DEFAULT_INPUT_ENTITY = 'input_text.holiday'
 DEFAULT_OFFSET = 0
 
-PERSISTENCE = '.shopping_list.json'
-
+SHOPPING_LIST_JSON = '.shopping_list.json'
 SERVICE_URL = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?ServiceKey={0}&solYear={1}&solMonth={2}'
+GITHUB_URL = 'https://raw.githubusercontent.com/GrecHouse/api/master/holiday.json'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_SERVICE_KEY): cv.string,
+    vol.Optional(CONF_INPUT_ENTITY, default=DEFAULT_INPUT_ENTITY): cv.entity_id,
+    vol.Optional(CONF_USE_SHOPPING_LIST, default=False): cv.boolean,
     vol.Optional(CONF_EXCLUDES, default=DEFAULT_EXCLUDES):
         vol.All(cv.ensure_list, [vol.In(ALLOWED_DAYS)]),
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
@@ -51,8 +57,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_ADD_HOLIDAYS): vol.All(cv.ensure_list, [cv.string]),
 })
 
-
-def setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the Workday sensor."""
     sensor_name = config.get(CONF_NAME)
     service_key = config.get(CONF_SERVICE_KEY)
@@ -60,20 +65,16 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     excludes = config.get(CONF_EXCLUDES)
     days_offset = config.get(CONF_OFFSET)
     add_holidays = config.get(CONF_ADD_HOLIDAYS)
+    input_entity = config.get(CONF_INPUT_ENTITY)
+    shopping_list = config.get(CONF_USE_SHOPPING_LIST)
+    
+    device = IsWorkdaySensor(
+        hass, add_holidays, workdays, excludes, days_offset, sensor_name, service_key, input_entity, shopping_list)
 
-    obj_holidays = []
+    async_track_point_in_utc_time(
+        hass, device.point_in_time_listener, device.get_next_interval())
 
-    # Add custom holidays
-    try:
-        for dateStr in add_holidays:
-            obj_holidays.append(dateStr)
-            _LOGGER.debug("Add custom holiday : %s", dateStr)
-    except TypeError:
-        _LOGGER.debug("No custom holidays or invalid holidays")
-
-    add_entities([IsWorkdaySensor(
-        obj_holidays, workdays, excludes, days_offset, sensor_name, service_key)], True)
-
+    async_add_entities([device], True)
 
 def day_to_string(day):
     """Convert day index 0 - 7 to string."""
@@ -82,24 +83,49 @@ def day_to_string(day):
     except IndexError:
         return None
 
-def get_date(date):
-    """Return date. Needed for testing."""
-    return date
-
-
 class IsWorkdaySensor(BinarySensorDevice):
     """Implementation of a Workday sensor."""
 
-    def __init__(self, obj_holidays, workdays, excludes, days_offset, name, service_key):
+    def __init__(self, hass, add_holidays, workdays, excludes, days_offset, name, service_key, input_entity, shopping_list):
         """Initialize the Workday sensor."""
         self._name = name
+        self._hass = hass
         self._service_key = service_key
-        self._obj_holidays = obj_holidays
+        self._input_entity = input_entity
+        self._add_holidays = add_holidays
         self._workdays = workdays
         self._excludes = excludes
         self._days_offset = days_offset
+        self._shopping_list = shopping_list
+        self._obj_holidays = []
         self._state = None
-        self._last_updated = None
+        self._holiday_name = None
+
+    async def async_added_to_hass(self):
+        """Register callbacks."""
+
+        @callback
+        def sensor_state_listener(entity, old_state, new_state):
+            """Handle input_text.holiday state changes."""
+            #self.async_schedule_update_ha_state(True)
+            self._update_internal_state()
+
+        @callback
+        def sensor_startup(event):
+            """Update template on startup."""
+            async_track_state_change(self._hass, [self._input_entity], sensor_state_listener)
+            #self.async_schedule_update_ha_state(True)
+            self._update_internal_state()
+
+        self._hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, sensor_startup)
+
+    @callback
+    def point_in_time_listener(self, time_date):
+        """Get the latest data and update state."""
+        self._update_internal_state()
+        self.async_schedule_update_ha_state()
+        async_track_point_in_utc_time(
+            self.hass, self.point_in_time_listener, self.get_next_interval())
 
     @property
     def name(self):
@@ -110,6 +136,17 @@ class IsWorkdaySensor(BinarySensorDevice):
     def is_on(self):
         """Return the state of the device."""
         return self._state
+
+    @property
+    def state_attributes(self):
+        """Return the attributes of the entity."""
+        return {
+            CONF_WORKDAYS: self._workdays,
+            CONF_EXCLUDES: self._excludes,
+            CONF_OFFSET: self._days_offset,
+            CONF_HOLIDAY_NAME: self._holiday_name
+        }
+
 
     def is_include(self, day, now):
         """Check if given day is in the includes list."""
@@ -127,30 +164,73 @@ class IsWorkdaySensor(BinarySensorDevice):
             return True
         return False
 
-    def add_korean_holiday(self, now):
+    def add_holiday_from_api(self, now):
         """Check for korean holiday API results."""
         yy = str(now.year)
         mm = str('{:02d}'.format(now.month))
         req_url = SERVICE_URL.format(self._service_key, yy, mm)
         try:
-            res = requests.get(req_url, timeout=10)
+            res = get(req_url, timeout=10)
             res.raise_for_status()
-            tree = ET.ElementTree(ET.fromstring(res.content))
-            root = tree.getroot()
-            if not ET.iselement(root.find('body')):
-                _LOGGER.error( 'API Call Error. %s', res.content )
-                return False
-            _LOGGER.debug( 'API Call Success. %s', res.content )
-            for item in root.findall('body/items/item/locdate'):
-                self._obj_holidays.append(item.text)
-                _LOGGER.debug("Add API holiday : %s", item.text)
+            xml = res.content.decode('utf8')
+            dic = xmltodict.parse(xml)
+            if '00' == dic['response']['header']['resultCode'] and '0' != dic['response']['body']['totalCount']:
+                hlist = dic['response']['body']['items']['item']
+                if isinstance(hlist, list):
+                    for holiday in hlist:
+                        self._obj_holidays.append(holiday['locdate'])
+                        self._obj_holidays.append("#"+holiday['dateName'])
+                        _LOGGER.debug("Add API holiday : %s", holiday['locdate'])
+                elif len(hlist) > 0:
+                    self._obj_holidays.append(hlist['locdate'])
+                    self._obj_holidays.append("#"+hlist['dateName'])
+                    _LOGGER.debug("Add API holiday : %s", hlist['locdate'])
         except Exception as ex:
             _LOGGER.error('Failed to get data.go.kr API Error: %s', ex)
-        return False
 
-    def add_shopping_list_holiday(self):
+    def add_holiday_from_gh(self):
+        """Check for korean holiday JSON results."""
+        try:
+            res = get(GITHUB_URL, timeout=10)
+            res.raise_for_status()
+            result = res.json()
+            hlist = result['item']
+            if isinstance(hlist, list):
+                for holiday in hlist:
+                    self._obj_holidays.append(holiday['locdate'])
+                    self._obj_holidays.append("#"+holiday['dateName'])
+                    _LOGGER.debug("Add GH holiday : %s", holiday['locdate'])
+            elif len(hlist) > 0:
+                self._obj_holidays.append(hlist['locdate'])
+                self._obj_holidays.append("#"+hlist['dateName'])
+                _LOGGER.debug("Add GH holiday : %s", hlist['locdate'])
+        except Exception as ex:
+            _LOGGER.error('Failed to get Github JSON Error: %s', ex)
+
+    def add_holiday_from_input(self, now):
+        add_input = self._hass.states.get(self._input_entity)
+        if add_input:
+            holis = add_input.state.splitlines()
+            for item in holis:
+                name = ''
+                if "#" in item:
+                    ii = item.split("#")
+                    name = ii[1]
+                    item = ii[0]
+                if len(item) == 4:
+                    item = str(now.year) + item
+                try:
+                    datetime.strptime(item, '%Y%m%d')
+                    self._obj_holidays.append(item)
+                    if '' != name:
+                        self._obj_holidays.append("#"+name)
+                    _LOGGER.debug("Add InputText holiday : %s", item)
+                except ValueError:
+                    _LOGGER.debug("Not date : %s", item)
+
+    def add_holiday_from_shopping_list(self):
         """Check for user added holiday."""
-        shopping_list = load_json(self.hass.config.path(PERSISTENCE), default=[])
+        shopping_list = load_json(self.hass.config.path(SHOPPING_LIST_JSON), default=[])
         for item in shopping_list:
             if item['name'].startswith('#'):
                 adddate = item['name'].replace('#','')
@@ -165,45 +245,58 @@ class IsWorkdaySensor(BinarySensorDevice):
                 except ValueError:
                     _LOGGER.debug("Not date : %s", adddate)
 
-    def set_last_updated(self, last_updated):
-        """Set the state attributes."""
-        self._last_updated = last_updated
+    def get_next_interval(self, now=None):
+        """Compute next time an update should occur."""
+        if now is None:
+            now = dt_util.utcnow()
+        now = dt_util.start_of_local_day(dt_util.as_local(now))
+        return now + timedelta(seconds=86400)
 
-    @property
-    def state_attributes(self):
-        """Return the attributes of the entity."""
-        # return self._attributes
-        return {
-            CONF_WORKDAYS: self._workdays,
-            CONF_EXCLUDES: self._excludes,
-            CONF_OFFSET: self._days_offset,
-            'last_updated': datetime.today()
-        }
-
-    async def async_update(self):
+    def _update_internal_state(self):
         """Get date and look whether it is a holiday."""
         # Default is no workday
         self._state = False
+        self._obj_holidays.clear()
+
+        # Add custom holidays
+        try:
+            for dateStr in self._add_holidays:
+                self._obj_holidays.append(dateStr)
+                _LOGGER.debug("Add custom holiday : %s", dateStr)
+        except TypeError:
+            _LOGGER.debug("No custom holidays or invalid holidays")
 
         # Get iso day of the week (1 = Monday, 7 = Sunday)
-        date = get_date(datetime.today()) + timedelta(days=self._days_offset)
+        date = datetime.today() + timedelta(days=self._days_offset)
         day = date.isoweekday() - 1
         day_of_week = day_to_string(day)
-        dateStr = date.strftime('%Y%m%d')
+        today = date.strftime('%Y%m%d')
 
-        self.add_shopping_list_holiday()
+        self.add_holiday_from_input(date)
 
-        if self._service_key and \
-            ( self._last_updated is None or self._last_updated.strftime('%Y%m%d') != dateStr ) :
-            _LOGGER.debug( 'last_updated : %s , now : %s', self._last_updated, datetime.today() )
-            self.add_korean_holiday(date)
+        if self._shopping_list:
+            self.add_holiday_from_shopping_list()
 
-        if self.is_include(day_of_week, dateStr):
+        if self._service_key:
+            self.add_holiday_from_api(date)
+        else:
+            self.add_holiday_from_gh()
+
+        holidays = self._obj_holidays
+
+        try:
+            name = holidays[holidays.index(today)+1]
+            if name and name.startswith("#"):
+                self._holiday_name = name[1:]
+        except Exception as ex: 
+            self._holiday_name = None
+            #_LOGGER.debug(ex)
+
+        if self.is_include(day_of_week, today):
             self._state = True
 
-        if self.is_exclude(day_of_week, dateStr):
+        if self.is_exclude(day_of_week, today):
             self._state = False
 
-        self.set_last_updated(datetime.today())
-
-
+        _LOGGER.debug('Holiday List : %s', holidays)
+        _LOGGER.info('Korean Workday Updated : %s', datetime.today())
