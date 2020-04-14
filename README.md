@@ -12,7 +12,7 @@
 ## Screenshot
 ![screenshot_korean_workday](https://user-images.githubusercontent.com/49514473/79182222-44311080-7e49-11ea-8ccd-5d676027717c.png)\
 \
-![screenshot_workday_card](https://user-images.githubusercontent.com/49514473/79179537-cff36e80-7e42-11ea-8214-f42edbbc5703.png)
+![screenshot_holiday_card](https://user-images.githubusercontent.com/49514473/79179537-cff36e80-7e42-11ea-8214-f42edbbc5703.png)
 
 <br>
 
@@ -42,7 +42,7 @@
 - HACS > INTEGRATIONS 메뉴에서 `[KR] Korean Workday Sensor` 검색하여 설치
 
 ### Lovelace 카드 설치
-- [korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card)
+- [holiday lovelace card](https://github.com/GrecHouse/korean-workday-card)
 
 <br>
 
@@ -52,7 +52,7 @@
 - 공공데이터포털 API 없이도 매일 휴일 목록을 업데이트합니다.\
 API 키 발급이 필요없습니다.
 - 1.0 버전의 장보기목록(Shopping List) 대신 사용할 수 있는 커스텀 카드를 만들었습니다.\
-[korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card) 를 이용하세요.
+[holiday lovelace card](https://github.com/GrecHouse/korean-workday-card) 를 이용하세요.
 - 휴일인 경우 속성값으로 `holiday name`이 추가됩니다.
 
 <br>
@@ -66,7 +66,7 @@ API 키 발급이 필요없습니다.
 <br>
 
 ### (옵션) 장보기목록(Shopping List) 이용하기
-- 이 옵션보다는 [korean workday lovelace card](https://github.com/GrecHouse/korean-workday-card) 사용을 권장합니다.
+- 이 옵션보다는 [holiday lovelace card](https://github.com/GrecHouse/korean-workday-card) 사용을 권장합니다.
 - shopping_list 옵션을 true 로 지정했을 경우에만 처리됩니다.
 - 장보기목록에 `#YYYYMMDD` 형식으로 날짜를 넣으면 휴일로 추가됩니다.
 - 장보기목록에서 완료처리(체크) 하면 휴일에서 제거됩니다.
