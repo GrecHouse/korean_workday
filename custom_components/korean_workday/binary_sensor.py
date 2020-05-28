@@ -11,7 +11,10 @@ from datetime import datetime, timedelta
 import voluptuous as vol
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME, WEEKDAYS, EVENT_HOMEASSISTANT_START
-from homeassistant.components.binary_sensor import BinarySensorDevice
+try:
+    from homeassistant.components.binary_sensor import BinarySensorEntity
+except:
+    from homeassistant.components.binary_sensor import BinarySensorDevice as BinarySensorEntity
 from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.helpers.event import async_track_point_in_utc_time
@@ -84,7 +87,7 @@ def day_to_string(day):
     except IndexError:
         return None
 
-class IsWorkdaySensor(BinarySensorDevice):
+class IsWorkdaySensor(BinarySensorEntity):
     """Implementation of a Workday sensor."""
 
     def __init__(self, hass, add_holidays, workdays, excludes, days_offset, name, service_key, input_entity, shopping_list):
