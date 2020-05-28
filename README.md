@@ -1,4 +1,4 @@
-![version](https://img.shields.io/badge/version-2.1-blue)
+![version](https://img.shields.io/badge/version-2.2-blue)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
 # Korean Workday Binary Sensor
@@ -22,6 +22,7 @@
 | v1.0    | 2019.04.15  | 최초 버전 |
 | v2.0    | 2020.04.14  | 기능개선, lovelace 카드 추가 |
 | v2.1    | 2020.05.28  | API 호출 비동기화 |
+| v2.2    | 2020.05.28  | deprecated warning 관련 수정 |
 
 <br>
 
@@ -37,10 +38,11 @@
 - Home Assistant 를 재시작합니다.
 
 ### HACS로 설치
-- HACS > SETTINGS 메뉴 선택
-- ADD CUSTOM REPOSITORY에 `https://github.com/GrecHouse/korean_workday` 입력, \
-  Category에 `Integration` 선택 후 저장
-- HACS > INTEGRATIONS 메뉴에서 `[KR] Korean Workday Sensor` 검색하여 설치
+- HACS > Integrations 메뉴 선택
+- 우측 상단 메뉴 버튼 클릭 후 Custom repositories 선택
+- Add Custom Repository URL 에 `https://github.com/GrecHouse/korean_workday` 입력, \
+  Category에 `Integration` 선택 후 ADD
+- HACS > Integrations 메뉴에서 우측 하단 + 버튼 누르고 `[KR] Korean Workday Sensor` 검색하여 설치
 
 ### Lovelace 카드 설치
 - [holiday lovelace card](https://github.com/GrecHouse/korean-workday-card)
