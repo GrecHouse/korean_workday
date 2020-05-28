@@ -15,12 +15,13 @@ from homeassistant.components.binary_sensor import BinarySensorDevice
 from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.helpers.event import async_track_point_in_utc_time
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
 from homeassistant.util.json import load_json
-from requests import get
 import json
 import xmltodict
+import async_timeout
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     add_holidays = config.get(CONF_ADD_HOLIDAYS)
     input_entity = config.get(CONF_INPUT_ENTITY)
     shopping_list = config.get(CONF_USE_SHOPPING_LIST)
-    
+
     device = IsWorkdaySensor(
         hass, add_holidays, workdays, excludes, days_offset, sensor_name, service_key, input_entity, shopping_list)
 
@@ -100,29 +101,30 @@ class IsWorkdaySensor(BinarySensorDevice):
         self._obj_holidays = []
         self._state = None
         self._holiday_name = None
+        self._session = async_get_clientsession(self._hass)
 
     async def async_added_to_hass(self):
         """Register callbacks."""
 
         @callback
-        def sensor_state_listener(entity, old_state, new_state):
+        async def sensor_state_listener(entity, old_state, new_state):
             """Handle input_text.holiday state changes."""
             #self.async_schedule_update_ha_state(True)
-            self._update_internal_state()
+            await self._update_internal_state()
 
         @callback
-        def sensor_startup(event):
+        async def sensor_startup(event):
             """Update template on startup."""
             async_track_state_change(self._hass, [self._input_entity], sensor_state_listener)
             #self.async_schedule_update_ha_state(True)
-            self._update_internal_state()
+            await self._update_internal_state()
 
         self._hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, sensor_startup)
 
     @callback
-    def point_in_time_listener(self, time_date):
+    async def point_in_time_listener(self, time_date):
         """Get the latest data and update state."""
-        self._update_internal_state()
+        await self._update_internal_state()
         self.async_schedule_update_ha_state()
         async_track_point_in_utc_time(
             self.hass, self.point_in_time_listener, self.get_next_interval())
@@ -147,7 +149,6 @@ class IsWorkdaySensor(BinarySensorDevice):
             CONF_HOLIDAY_NAME: self._holiday_name
         }
 
-
     def is_include(self, day, now):
         """Check if given day is in the includes list."""
         if day in self._workdays:
@@ -164,15 +165,16 @@ class IsWorkdaySensor(BinarySensorDevice):
             return True
         return False
 
-    def add_holiday_from_api(self, now):
+    async def add_holiday_from_api(self, now):
         """Check for korean holiday API results."""
         yy = str(now.year)
         mm = str('{:02d}'.format(now.month))
         req_url = SERVICE_URL.format(self._service_key, yy, mm)
         try:
-            res = get(req_url, timeout=10)
-            res.raise_for_status()
-            xml = res.content.decode('utf8')
+            with async_timeout.timeout(10):
+                response = await self._session.get(req_url)
+            result = await response.read()
+            xml = result.decode('utf8')
             dic = xmltodict.parse(xml)
             if '00' == dic['response']['header']['resultCode'] and '0' != dic['response']['body']['totalCount']:
                 hlist = dic['response']['body']['items']['item']
@@ -188,12 +190,14 @@ class IsWorkdaySensor(BinarySensorDevice):
         except Exception as ex:
             _LOGGER.error('Failed to get data.go.kr API Error: %s', ex)
 
-    def add_holiday_from_gh(self):
+    async def add_holiday_from_gh(self):
         """Check for korean holiday JSON results."""
         try:
-            res = get(GITHUB_URL, timeout=10)
-            res.raise_for_status()
-            result = res.json()
+            with async_timeout.timeout(10):
+                response = await self._session.get(GITHUB_URL)
+            result = await response.read()
+            result = json.loads(result)
+
             hlist = result['item']
             if isinstance(hlist, list):
                 for holiday in hlist:
@@ -252,7 +256,7 @@ class IsWorkdaySensor(BinarySensorDevice):
         now = dt_util.start_of_local_day(dt_util.as_local(now))
         return now + timedelta(seconds=86400)
 
-    def _update_internal_state(self):
+    async def _update_internal_state(self):
         """Get date and look whether it is a holiday."""
         # Default is no workday
         self._state = False
@@ -278,9 +282,9 @@ class IsWorkdaySensor(BinarySensorDevice):
             self.add_holiday_from_shopping_list()
 
         if self._service_key:
-            self.add_holiday_from_api(date)
+            await self.add_holiday_from_api(date)
         else:
-            self.add_holiday_from_gh()
+            await self.add_holiday_from_gh()
 
         holidays = self._obj_holidays
 
@@ -288,7 +292,7 @@ class IsWorkdaySensor(BinarySensorDevice):
             name = holidays[holidays.index(today)+1]
             if name and name.startswith("#"):
                 self._holiday_name = name[1:]
-        except Exception as ex: 
+        except Exception as ex:
             self._holiday_name = None
             #_LOGGER.debug(ex)
 
