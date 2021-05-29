@@ -6,5 +6,6 @@
   "dependencies": [],
   "codeowners": [
     "@GrecHouse"
-  ]
+  ],
+  "version": "2.2.1"
 }
