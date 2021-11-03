@@ -2,7 +2,7 @@
   "domain": "korean_workday",
   "name": "Korean Workday",
   "documentation": "https://github.com/GrecHouse/korean_workday",
-  "requirements": [],
+  "requirements": ["xmltodict==0.12.0"],
   "dependencies": [],
   "codeowners": [
     "@GrecHouse"
