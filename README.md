@@ -1,4 +1,4 @@
-![version](https://img.shields.io/badge/version-2.2.1-blue)
+![version](https://img.shields.io/badge/version-2.2.2-blue)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
 # Korean Workday Binary Sensor
@@ -24,6 +24,7 @@
 | v2.1    | 2020.05.28  | API 호출 비동기화 |
 | v2.2    | 2020.05.28  | deprecated warning 관련 수정 |
 | v2.2.1  | 2021.05.29  | added version to manifest.json |
+| v2.2.2  | 2021.11.04  | xmltodict requirements 로 처리 - HA Core 2021.11 |
 
 <br>
 
