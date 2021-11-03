@@ -23,7 +23,6 @@ import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
 from homeassistant.util.json import load_json
 import json
-import xmltodict
 import async_timeout
 
 _LOGGER = logging.getLogger(__name__)
