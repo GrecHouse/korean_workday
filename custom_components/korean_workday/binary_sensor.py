@@ -8,6 +8,7 @@ https://github.com/GrecHouse/korean_workday
 
 import logging
 from datetime import datetime, timedelta
+from pytz import timezone
 import voluptuous as vol
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME, WEEKDAYS, EVENT_HOMEASSISTANT_START
@@ -17,10 +18,9 @@ except:
     from homeassistant.components.binary_sensor import BinarySensorDevice as BinarySensorEntity
 from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_state_change
-from homeassistant.helpers.event import async_track_point_in_utc_time
+from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
-import homeassistant.util.dt as dt_util
 from homeassistant.util.json import load_json
 import json
 import async_timeout
@@ -74,7 +74,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     device = IsWorkdaySensor(
         hass, add_holidays, workdays, excludes, days_offset, sensor_name, service_key, input_entity, shopping_list)
 
-    async_track_point_in_utc_time(
+    async_track_point_in_time(
         hass, device.point_in_time_listener, device.get_next_interval())
 
     async_add_entities([device], True)
@@ -128,7 +128,7 @@ class IsWorkdaySensor(BinarySensorEntity):
         """Get the latest data and update state."""
         await self._update_internal_state()
         self.async_schedule_update_ha_state()
-        async_track_point_in_utc_time(
+        async_track_point_in_time(
             self.hass, self.point_in_time_listener, self.get_next_interval())
 
     @property
@@ -253,10 +253,9 @@ class IsWorkdaySensor(BinarySensorEntity):
 
     def get_next_interval(self, now=None):
         """Compute next time an update should occur."""
-        if now is None:
-            now = dt_util.utcnow()
-        now = dt_util.start_of_local_day(dt_util.as_local(now))
-        return now + timedelta(seconds=86400)
+        now = datetime.now(timezone('Asia/Seoul'))
+        today = datetime(now.year, now.month, now.day)
+        return today + timedelta(days=1)
 
     async def _update_internal_state(self):
         """Get date and look whether it is a holiday."""
