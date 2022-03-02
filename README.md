@@ -4,8 +4,13 @@
 # Korean Workday Binary Sensor
 
 현재 날짜가 일하는날인지의 여부를 나타냅니다. \
-파이썬의 holidays 모듈을 사용하는 HA의 workday 센서가 한국 휴일을 지원하지 않기 때문에, \
+파이썬의 holidays 모듈을 사용하는 HA의 workday 센서가 한국 휴일을 지원하지 ~~않기~~ 않았었기 때문에, \
 공공데이터포털의 휴일 API를 이용하는 커스텀 컴포넌트를 만들었습니다.
+
+<br>
+
+2020년 중반 이후 HA 기본 Workday 센서에서 `KR` 을 지원합니다. \
+기본 센서 대비 이 커스텀 컴포넌트의 장점은 `임시공휴일`을 지원하는 것에 있습니다.
 
 <br>
 
@@ -64,7 +69,7 @@ API 키 발급이 필요없습니다.
 <br>
 
 ### (옵션) 공공데이터포털 OPEN API 이용하기
-- 직접 API를 이용하고 싶은 분은 사용하셔도 됩니다.
+- 안 해도 됩니다. 직접 API를 이용하고 싶은 분만 설정하면 됩니다.
 - 하루에 한 번 API 호출을 통해 휴일 목록을 가져옵니다.
 - 공공데이터포털에서 서비스키를 발급받아야 합니다.\
 [특일정보 활용신청](https://www.data.go.kr/dataset/15012690/openapi.do)
@@ -172,6 +177,6 @@ automation:
 
 ## 버그 또는 문의사항
 네이버 카페 [HomeAssistant](https://cafe.naver.com/koreassistant/) `그렉하우스` \
-네이버 카페 [SmartThings&IoT Home](https://cafe.naver.com/stsmarthome/) `그렉하우스`
+네이버 카페 [모두의 스마트홈](https://cafe.naver.com/stsmarthome/) `그렉하우스`
 
 
