@@ -1,4 +1,4 @@
-![version](https://img.shields.io/badge/version-2.3-blue)
+![version](https://img.shields.io/badge/version-2.4-blue)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
 # Korean Workday Binary Sensor
@@ -31,6 +31,7 @@
 | v2.2.1  | 2021.05.29  | added version to manifest.json |
 | v2.2.2  | 2021.11.04  | xmltodict requirements 로 처리 - HA Core 2021.11 |
 | v2.3    | 2021.11.08  | async_track_point_in_time, KST 로 변경 |
+| v2.4    | 2022.12.19  | remove_holidays 옵션 추가 |
 
 <br>
 
@@ -106,7 +107,9 @@ binary_sensor:
   - platform: korean_workday
     service_key: 'data.go.kr api key'
     add_holidays:
-      - '20190501'
+      - 20190501
+    remove_holidays:
+      - 20221218
 
 input_text:
   holiday:
@@ -123,6 +126,7 @@ input_text:
 |name| (옵션) 센서 이름. 미설정시 기본값은 'korean_workday' |
 |service_key| (옵션) data.go.kr 서비스키 |
 |add_holidays| (옵션) 휴일로 추가할 날짜 리스트 'YYYMMDD' 형식<br>주의! YYYY-MM-DD가 아님 |
+|remove_holidays| (옵션) 휴일에서 제거할 날짜 리스트 'YYYMMDD' 형식<br>주의! YYYY-MM-DD가 아님 |
 |workdays| (옵션) 근무일 리스트. 미설정시 기본값은 [mon, tue, wed, thu, fri] |
 |excludes| (옵션) 휴일 리스트. 미설정시 기본값은 [sat, sun, holiday] |
 |days_offset| (옵션) Set days offset (e.g., -1 for yesterday, 1 for tomorrow) |
@@ -178,5 +182,3 @@ automation:
 ## 버그 또는 문의사항
 네이버 카페 [HomeAssistant](https://cafe.naver.com/koreassistant/) `그렉하우스` \
 네이버 카페 [모두의 스마트홈](https://cafe.naver.com/stsmarthome/) `그렉하우스`
-
-

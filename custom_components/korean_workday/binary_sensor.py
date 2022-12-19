@@ -36,6 +36,7 @@ CONF_ADD_HOLIDAYS = 'add_holidays'
 CONF_HOLIDAY_NAME = 'holiday_name'
 CONF_INPUT_ENTITY = 'input_entity'
 CONF_USE_SHOPPING_LIST = 'shopping_list'
+CONF_REMOVE_HOLIDAYS = 'remove_holidays'
 
 DEFAULT_WORKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri']
 DEFAULT_EXCLUDES = ['sat', 'sun', 'holiday']
@@ -57,7 +58,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_OFFSET, default=DEFAULT_OFFSET): vol.Coerce(int),
     vol.Optional(CONF_WORKDAYS, default=DEFAULT_WORKDAYS):
         vol.All(cv.ensure_list, [vol.In(ALLOWED_DAYS)]),
-    vol.Optional(CONF_ADD_HOLIDAYS): vol.All(cv.ensure_list, [cv.string]),
+    vol.Optional(CONF_ADD_HOLIDAYS, default=[]): vol.All(cv.ensure_list, [cv.string]),
+    vol.Optional(CONF_REMOVE_HOLIDAYS, default=[]): vol.All(cv.ensure_list, [cv.string]),
 })
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -68,11 +70,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     excludes = config.get(CONF_EXCLUDES)
     days_offset = config.get(CONF_OFFSET)
     add_holidays = config.get(CONF_ADD_HOLIDAYS)
+    remove_holidays = config.get(CONF_REMOVE_HOLIDAYS)
     input_entity = config.get(CONF_INPUT_ENTITY)
     shopping_list = config.get(CONF_USE_SHOPPING_LIST)
 
     device = IsWorkdaySensor(
-        hass, add_holidays, workdays, excludes, days_offset, sensor_name, service_key, input_entity, shopping_list)
+        hass, add_holidays, remove_holidays, workdays, excludes, days_offset, sensor_name, service_key, input_entity, shopping_list)
 
     async_track_point_in_time(
         hass, device.point_in_time_listener, device.get_next_interval())
@@ -89,13 +92,15 @@ def day_to_string(day):
 class IsWorkdaySensor(BinarySensorEntity):
     """Implementation of a Workday sensor."""
 
-    def __init__(self, hass, add_holidays, workdays, excludes, days_offset, name, service_key, input_entity, shopping_list):
+    def __init__(self, hass, add_holidays, remove_holidays, workdays, excludes, days_offset, name, service_key, input_entity, shopping_list):
         """Initialize the Workday sensor."""
         self._name = name
         self._hass = hass
         self._service_key = service_key
         self._input_entity = input_entity
         self._add_holidays = add_holidays
+        self._remove_holidays = remove_holidays
+
         self._workdays = workdays
         self._excludes = excludes
         self._days_offset = days_offset
@@ -152,7 +157,6 @@ class IsWorkdaySensor(BinarySensorEntity):
         }
 
     def is_include(self, day, now):
-        """Check if given day is in the includes list."""
         if day in self._workdays:
             return True
         if 'holiday' in self._workdays and now in self._obj_holidays:
@@ -161,6 +165,8 @@ class IsWorkdaySensor(BinarySensorEntity):
 
     def is_exclude(self, day, now):
         """Check if given day is in the excludes list."""
+        if now in self._remove_holidays:
+            return False
         if day in self._excludes:
             return True
         if 'holiday' in self._excludes and now in self._obj_holidays:
@@ -286,6 +292,17 @@ class IsWorkdaySensor(BinarySensorEntity):
             await self.add_holiday_from_api(date)
         else:
             await self.add_holiday_from_gh()
+
+        # Remove holidays
+        try:
+            for remove_holiday in self._remove_holidays:
+                try:
+                    removed = self._obj_holidays.pop(remove_holiday)
+                    _LOGGER.debug("Removed %s", remove_holiday)
+                except KeyError as unmatched:
+                    _LOGGER.warning("No holiday found matching %s", unmatched)
+        except TypeError:
+            _LOGGER.debug("No holidays to remove or invalid holidays")
 
         holidays = self._obj_holidays
 
