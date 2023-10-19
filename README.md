@@ -1,6 +1,21 @@
 ![version](https://img.shields.io/badge/version-2.4-blue)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
+
+# 🔥 이 커스텀 컴포넌트는 더이상 관리되지 않습니다.
+
+HA 초창기와 달리 기본 컴포넌트에서도 한국 휴일을 지원하고 있고, \
+임시 공휴일이나 대체 공휴일 미지원이 조금 아쉽기는 하지만 통합구성요소로 쉽게 추가 설정이 가능하기 때문에 \
+이 커스텀 컴포넌트는 더 이상 유지보수를 하지 않기로 결정했습니다.
+
+아래의 "근무일" 통합구성요소를 이용하세요. \
+https://www.home-assistant.io/integrations/workday
+
+[![Add component](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=workday)
+
+<br><br>
+
+
 # Korean Workday Binary Sensor
 
 현재 날짜가 일하는날인지의 여부를 나타냅니다. \
