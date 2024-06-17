@@ -17,7 +17,7 @@ try:
 except:
     from homeassistant.components.binary_sensor import BinarySensorDevice as BinarySensorEntity
 from homeassistant.core import callback
-from homeassistant.helpers.event import async_track_state_change_evnet
+from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
