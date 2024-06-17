@@ -17,7 +17,7 @@ try:
 except:
     from homeassistant.components.binary_sensor import BinarySensorDevice as BinarySensorEntity
 from homeassistant.core import callback
-from homeassistant.helpers.event import async_track_state_change
+from homeassistant.helpers.event import async_track_state_change_evnet
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
@@ -122,7 +122,7 @@ class IsWorkdaySensor(BinarySensorEntity):
         @callback
         async def sensor_startup(event):
             """Update template on startup."""
-            async_track_state_change(self._hass, [self._input_entity], sensor_state_listener)
+            async_track_state_change_event(self._hass, [self._input_entity], sensor_state_listener)
             #self.async_schedule_update_ha_state(True)
             await self._update_internal_state()
 
