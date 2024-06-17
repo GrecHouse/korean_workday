@@ -1,4 +1,4 @@
-![version](https://img.shields.io/badge/version-2.4-blue)
+![version](https://img.shields.io/badge/version-2.5-blue)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
 
@@ -47,6 +47,7 @@ https://www.home-assistant.io/integrations/workday
 | v2.2.2  | 2021.11.04  | xmltodict requirements 로 처리 - HA Core 2021.11 |
 | v2.3    | 2021.11.08  | async_track_point_in_time, KST 로 변경 |
 | v2.4    | 2022.12.19  | remove_holidays 옵션 추가 |
+| v2.5    | 2024.06.17  | deprecated 관련 수정 |
 
 <br>
 
