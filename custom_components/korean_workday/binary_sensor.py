@@ -8,7 +8,7 @@ https://github.com/GrecHouse/korean_workday
 
 import logging
 from datetime import datetime, timedelta
-from pytz import timezone
+from zoneinfo import ZoneInfo
 import voluptuous as vol
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME, WEEKDAYS, EVENT_HOMEASSISTANT_START
@@ -259,7 +259,7 @@ class IsWorkdaySensor(BinarySensorEntity):
 
     def get_next_interval(self, now=None):
         """Compute next time an update should occur."""
-        now = datetime.now(timezone('Asia/Seoul'))
+        now = datetime.now(ZoneInfo('Asia/Seoul'))
         today = datetime(now.year, now.month, now.day)
         return today + timedelta(days=1)
 
